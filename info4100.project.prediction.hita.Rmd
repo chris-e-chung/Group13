@@ -141,7 +141,9 @@ Be sure to use all students in the `con` dataset as the basis, not just those wh
 ############################################### 
 ####### BEGIN INPUT: Define outcome ###########
 ###############################################
-
+a
+con
+list(unique(con$student_id))
 # add code here
 
 ############################################### 
