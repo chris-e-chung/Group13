@@ -69,12 +69,23 @@ You can also plot the distribution of variables with histograms or boxplots.
 
 # Exploring Conversations data
 # add code here
-
+head(con)
+n_distinct(con$student_id)
+summary(con)
+table(con$system)
 # Exploring Activities data
 # add code here
+head(a)
+n_distinct(a$student_id)
+summary(a)
+table(a$completed)
 
 # Exploring connections between datasets
 # add code here
+
+# students in both datasets
+common_students <- intersect(unique(con$student_id), unique(a$student_id))
+length(common_students)  
 
 ###############################################
 ###############################################
