@@ -141,11 +141,38 @@ Be sure to use all students in the `con` dataset as the basis, not just those wh
 ############################################### 
 ####### BEGIN INPUT: Define outcome ###########
 ###############################################
-a
-con
-list(unique(con$student_id))
-# add code here
 
+student_list<-data.frame(student_id=unique(con$student_id))
+
+a_names<-data.frame(name = unique(a$name))|>
+  filter(str_detect(name, "Elaboration"))|> 
+  filter(name!="Week 8 Reading Elaboration: What's Wrong?")
+a
+deadlines <- data.frame(
+  week = c(2, 6, 3, 7, 3),
+  deadline = as.POSIXct(c("2025-02-01 05:00:00", "2025-03-01 05:00:00",
+                          "2025-02-08 05:00:00", "2025-03-08 05:00:00",
+                          "2025-02-08 05:00:00"), tz = "UTC"),
+  names = a_names
+)
+
+joined<-inner_join(a, deadlines)
+
+all_combinations <- expand.grid(
+  student_id = student_list$student_id,
+  name = a_names$name,
+  stringsAsFactors = FALSE
+)
+
+
+outcome <- left_join(all_combinations, joined) |>
+    mutate(
+    deadline_ts = as.numeric(deadline),
+    cutoff_ts = deadline_ts - (24 * 60 * 60),
+    missed = ifelse(is.na(completed) | !completed, 1, 0)
+  )
+
+outcome
 ############################################### 
 ############################################### 
 ```
