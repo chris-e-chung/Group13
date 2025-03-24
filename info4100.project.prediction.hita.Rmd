@@ -211,7 +211,40 @@ head(example_features)
 ###### BEGIN INPUT: Engineer features #########
 ###############################################
 
-# add code here
+# using the week 7 deadline
+week_7_deadline = as.numeric(as.POSIXct("2025-03-08 05:00:00", tz = "UTC"))
+
+# Set the time window to the 24 hours before the due date
+time_window_start = week_7_deadline - (60 * 60 * 24)
+
+# features
+features_week_7 = con %>% 
+  filter(as.numeric(as.POSIXct(created_at, tz = "UTC")) < time_window_start) %>%
+  group_by(student_id) %>%
+  summarise(
+    
+    num_chat_conversations = n_distinct(conversation_id[is.na(activity_step_id)]),  # Number of distinct conversations
+    
+    num_student_msgs = sum(system == 0),  
+    avg_student_msg_len = mean(length_char[system == 0]),  
+    num_messages_ai = sum(system == 1),  
+    avg_ai_msg_len = mean(length_char[system == 1] ) , 
+ # Number of messages by AI and Student, along with the lengths of the messages on  average
+
+    total_time_spent = sum(length_char),  
+ # Total time spent in conversations (based on message length)
+  
+    prop_ai_msgs = num_messages_ai / (num_student_msgs + num_messages_ai) ,
+ # Proportion of AI messages in all messages
+ 
+    total_attempts = sum(!is.na(activity_step_id)),  
+ # Total number of attempts at the activity
+  
+  
+  )
+
+# Check the features
+head(features_week_7)
 
 ###############################################
 ###############################################
@@ -233,10 +266,13 @@ Take all the remaining data (earlier periods for prior weeks) and store them in 
 
 # Identify last due elaboration activity for testing
 # add code here
+week_7_activity = "Week 7 Reading Elaboration: Multimedia Learning"
 
 # Split the dataset into train and test based on the activity_ids or periods
-# test = 
-# train = 
+test <- outcome %>%
+  filter(name == week_7_activity)
+train <- outcome %>%
+  filter(name != week_7_activity)
 
 ###############################################
 ###############################################
