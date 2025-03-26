@@ -239,6 +239,7 @@ features_week_7 = con %>%
  
     total_attempts = sum(!is.na(activity_step_id)),  
  # Total number of attempts at the activity
+ 
   
   
   )
@@ -291,21 +292,65 @@ Report your F1 score on the training data below (don't forget this!).
 ####### BEGIN INPUT: Train and report #########
 ###############################################
 
-# Fit  model to training data
-# add code here
+# Install packages if needed
+if (!require("rpart")) install.packages("rpart")
+if (!require("rpart.plot")) install.packages("rpart.plot")
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("e1071")) install.packages("e1071")
 
-# Get predictions
-# add code here
+# Load libraries
+library(rpart)
+library(rpart.plot)
+library(dplyr)
+library(e1071)
 
-# Compute accuracy, recall, precision, and F1
-# add code here
-F1 = 2 / (1/recall + 1/precision)
-  
-# Training F1 score is ...
-F1
+# Merge training outcomes with features (using student_id)
+train_data <- train %>%
+  left_join(features_week_7, by = "student_id") %>%
+  na.omit()
+
+# Convert outcome to factor (0 = complete, 1 = missed)
+train_data$missed <- as.factor(train_data$missed)
+
+# --- CART Model ---
+cart_model <- rpart(missed ~ num_chat_conversations + num_student_msgs + avg_student_msg_len +
+                      num_messages_ai + avg_ai_msg_len + total_time_spent + prop_ai_msgs +
+                      total_attempts,
+                    data = train_data, method = "class")
+
+# --- Naive Bayes Model ---
+nb_model <- naiveBayes(missed ~ num_chat_conversations + num_student_msgs + avg_student_msg_len +
+                         num_messages_ai + avg_ai_msg_len + total_time_spent + prop_ai_msgs +
+                         total_attempts,
+                       data = train_data)
+
+# Get predictions on training data
+cart_train_preds <- predict(cart_model, train_data, type = "class")
+nb_train_preds <- predict(nb_model, train_data, type = "class")
+
+# Function to compute precision, recall, and F1
+compute_metrics <- function(actual, predicted) {
+  cm <- table(factor(actual, levels = c(0,1)), factor(predicted, levels = c(0,1)))
+  TP <- cm["1","1"]
+  FP <- cm["0","1"]
+  FN <- cm["1","0"]
+  precision <- ifelse((TP+FP)==0, 0, TP/(TP+FP))
+  recall <- ifelse((TP+FN)==0, 0, TP/(TP+FN))
+  F1 <- ifelse((precision+recall)==0, 0, 2/((1/recall)+(1/precision)))
+  list(precision = precision, recall = recall, F1 = F1)
+}
+
+# Compute training F1 scores
+cart_train_metrics <- compute_metrics(train_data$missed, cart_train_preds)
+nb_train_metrics <- compute_metrics(train_data$missed, nb_train_preds)
+
+cat("CART Training F1 Score:", round(cart_train_metrics$F1, 3), "\n")
+cat("Naive Bayes Training F1 Score:", round(nb_train_metrics$F1, 3), "\n")
 
 ###############################################
 ###############################################
+
+
 ```
 
 # Step 6: Test your model
@@ -318,16 +363,26 @@ Typically, you would only do this once at the very end, but for this project it 
 ####### BEGIN INPUT: Test and report ##########
 ###############################################
 
-# Make predictions on the test dataset
-# add code here
+# Merge test outcomes with features (using student_id)
+test_data <- test %>%
+  left_join(features_week_7, by = "student_id") %>%
+  na.omit()
 
-# Compute F1
-# add code here
-F1 = 2 / (1/recall + 1/precision)
+# Convert outcome to factor
+test_data$missed <- as.factor(test_data$missed)
 
-# Testing F1 score is ...
-F1
+# Get predictions on test data using the CART model
+cart_test_preds <- predict(cart_model, test_data, type = "class")
 
+# Get predictions on test data using the Naive Bayes model
+nb_test_preds <- predict(nb_model, test_data, type = "class")
+
+# Compute F1 scores for the test data
+cart_test_metrics <- compute_metrics(test_data$missed, cart_test_preds)
+nb_test_metrics <- compute_metrics(test_data$missed, nb_test_preds)
+
+cat("CART Testing F1 Score:", round(cart_test_metrics$F1, 3), "\n")
+cat("Naive Bayes Testing F1 Score:", round(nb_test_metrics$F1, 3), "\n")
 ###############################################
 ###############################################
 ```
