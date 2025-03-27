@@ -397,7 +397,7 @@ Write your report answering the above questions here:
 
 %######## BEGIN INPUT: Summarize findings \############
 
-Add your summary here.
+Our analysis evaluated CART and Naive Bayes models to predict students at risk of missing elaboration activity deadlines using LMS interaction data. Key predictive features used included the number of general chat conversations, average student message length, and total activity attempts. The CART model achieved a training F1 score of 0.64 and a test F1 score of 0.3. The drop in performance between the training and testing score indicates overfitting. The Naive Bayes models achieved a training F1 score of 0.223 and a test F1 score of 0.143. So the CART model did slightly better than the Naive Bayes model at predicting. The F1 score gives a balance of the accuracy and recall, and for both models, the score is low. Given low scores, we don't recommend implementing this system without further refinement. This could include exploring more features or looking at more advanced predictive models.
 
 %###############################################
 
