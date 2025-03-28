@@ -1,6 +1,6 @@
 ---
 title: 'Group Project: Early Alert with LMS Data'
-author: '[[ADD YOUR NAME, CORNELL ID]]'
+author: '[[Omar Ahmed(owa2), Chris Chung(cc2299), Luke Cura(lbc83), Selina Lin(sxl7)]]'
 subtitle: INFO 4100/5101 Learning Analytics
 output:
   pdf_document: default
@@ -147,7 +147,7 @@ student_list<-data.frame(student_id=unique(con$student_id))
 a_names<-data.frame(name = unique(a$name))|>
   filter(str_detect(name, "Elaboration"))|> 
   filter(name!="Week 8 Reading Elaboration: What's Wrong?")
-a
+
 deadlines <- data.frame(
   week = c(2, 6, 3, 7, 3),
   deadline = as.POSIXct(c("2025-02-01 05:00:00", "2025-03-01 05:00:00",
@@ -172,7 +172,7 @@ outcome <- left_join(all_combinations, joined) |>
     missed = ifelse(is.na(completed) | !completed, 1, 0)
   )
 
-outcome
+head(outcome)
 ############################################### 
 ############################################### 
 ```
@@ -405,7 +405,7 @@ Our analysis evaluated CART and Naive Bayes models to predict students at risk o
 
 **We want to give students an estimate of how much time this project will take. Please indicate how many hours you spent as a team to complete this project here.**
 
--   I spent [insert your time] hours.
+-   We spent 5 hours.
 
 # Generative AI usage
 
@@ -413,6 +413,8 @@ Our analysis evaluated CART and Naive Bayes models to predict students at risk o
 
 -   How much did you use generative AI (e.g., not at all, some, most, or all the questions) and which one did you use?
 -   If you used generative AI, how did you use it and was it helpful?
+
+We used generative AI for question 2. It was helpful to check that we were building the dataset correctly and to check the syntax of functions like inner_join and left_join.
 
 # Submit Project
 
